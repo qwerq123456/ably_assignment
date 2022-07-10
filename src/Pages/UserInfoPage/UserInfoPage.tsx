@@ -1,9 +1,9 @@
+import UserInfoCard from '../../components/Organisms/UserInfoCard';
+
 const UserInfoPage = () => {
     return (
         <div className="UserInfoPage">
-            <text>
-                UserInfoPage
-            </text>
+            <UserInfoCard />
         </div>
     );
 };
