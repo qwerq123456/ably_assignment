@@ -21,5 +21,5 @@ module.exports = {
         '.png',
     ],
     setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect'],
-    testEnvironment: 'jsdom'
+    testEnvironment: 'jsdom',
 };
