@@ -18,6 +18,8 @@ module.exports = {
         },
     },
     rules: {
+        'react-hooks/exhaustive-deps': 'off',
+        'no-alert': 'off',
         'react/jsx-indent-props': [2, 4],
         'key-spacing': 'off',
         'comma-dangle': 'off',
