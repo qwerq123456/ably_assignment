@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { BASE_URL } from '../config';
-import { ACCESS_TOKEN_NAME, getCookie } from '../Cookies';
+import { BASE_URL } from './config';
+import { ACCESS_TOKEN_NAME, getCookie } from './Cookies';
 
 export const CreateAxios = axios.create({
     baseURL: BASE_URL,
@@ -20,7 +20,14 @@ CreateAxios.interceptors.request.use(
     }
 );
 
-export interface APIErrorType {
+CreateAxios.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        const err = error as APIErrorType;
+        alert(err.response.data.error.message);
+    }
+);
+interface APIErrorType {
     response: {
         data: {
             error: {
@@ -42,5 +49,18 @@ export interface UserInfoType {
         email: string;
         profileImage: string;
         lastConnectedAt: Date;
+    }
+}
+
+export interface IssueTokenResponseType {
+    data: {
+        issueToken: string,
+        remainMillisecond: number,
+    }
+}
+
+export interface ConfirmTokenResponseType {
+    data: {
+        confirmToken: string;
     }
 }
