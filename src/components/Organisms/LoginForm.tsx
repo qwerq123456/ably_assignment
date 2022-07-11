@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import {
     API, ACCESS_TOKEN_NAME, setCookie, CreateAxios, LoginResponceType
 } from '../../utils';
-import { InputForm } from '../Molecules';
+import {
+    Button, Form, Input
+} from 'antd';
+import 'antd/dist/antd.css';
 
 const LOGIN_TEXT = '로그인';
 const EMAIL_TEXT = 'email';
@@ -12,30 +15,15 @@ const LOGIN_SUCCESS = '로그인 성공!';
 const USER_INFO_URL = '/userinfo';
 const PASSWORD_TEXT = 'password';
 
-const LOGIN_LABEL = 'login_label';
+const PASSWORD_CHANGE_TEXT = '비밀번호 변경';
+const RESET_PASSWORD_URL = '/reset-password';
 
 export const LoginForm = () => {
-    const [form, setForm] = useState({
-        email: '',
-        password: ''
-    });
-
     const navigate = useNavigate();
 
-    const { email, password } = form;
-
-    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setForm({
-            ...form,
-            [name]: value,
-        });
-    };
-
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const onFinish = async (values: { email: string; password: string }) => {
         try {
-            const loginResponse: LoginResponceType = await CreateAxios.post(API.LOGIN, form);
+            const loginResponse: LoginResponceType = await CreateAxios.post(API.LOGIN, values);
             console.log(`login response : ${JSON.stringify(loginResponse)}`);
             setCookie(ACCESS_TOKEN_NAME, loginResponse.data.accessToken, { path: '/' });
             alert(LOGIN_SUCCESS);
@@ -45,13 +33,73 @@ export const LoginForm = () => {
         }
     };
 
+    const onClickPasswordChangeButton = () => {
+        navigate(RESET_PASSWORD_URL);
+    };
+    const [tempform] = Form.useForm();
+    const temponChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        tempform.setFieldsValue({ ...tempform, [name]: value });
+    };
     return (
-        <form aria-label={ LOGIN_LABEL } onSubmit={ handleSubmit }>
-            <InputForm title={ EMAIL_TEXT } value={ email } type="email" onChange={ onChange } />
-            <InputForm title={ PASSWORD_TEXT } value={ password } type="password" onChange={ onChange } />
-            <button type="submit">
-                { LOGIN_TEXT }
-            </button>
-        </form>
+        <Form
+            form={ tempform }
+            name={ LOGIN_TEXT }
+            colon={ false }
+            labelCol={ {
+                span: 4,
+            } }
+            wrapperCol={ {
+                span: 16,
+            } }
+            initialValues={ {
+                email: '',
+                password: '',
+            } }
+            onFinish={ onFinish }
+        >
+            <Form.Item
+                label="Email"
+                name={ EMAIL_TEXT }
+                rules={ [
+                    {
+                        required: true,
+                        message: '이메일을 입력해주세요',
+                    },
+                    {
+                        pattern: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
+                        message: '이메일 형식으로 써주세요',
+                    },
+                ] }
+            >
+                <Input onChange={ temponChange } />
+            </Form.Item>
+            <Form.Item
+                label="Password"
+                name={ PASSWORD_TEXT }
+                rules={ [
+                    {
+                        required: true,
+                        message: '비밀번호를 입력해주세요',
+                    },
+                ] }
+            >
+                <Input.Password />
+            </Form.Item>
+            <Form.Item wrapperCol={ {
+                offset: 4,
+                span: 16,
+            } }
+            >
+                <Button htmlType="submit">{ LOGIN_TEXT }</Button>
+            </Form.Item>
+            <Form.Item wrapperCol={ {
+                offset: 4,
+                span: 16,
+            } }
+            >
+                <Button htmlType="button" onClick={ onClickPasswordChangeButton }>{ PASSWORD_CHANGE_TEXT }</Button>
+            </Form.Item>
+        </Form>
     );
 };
