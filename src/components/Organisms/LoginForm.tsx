@@ -36,14 +36,15 @@ export const LoginForm = () => {
     const onClickPasswordChangeButton = () => {
         navigate(RESET_PASSWORD_URL);
     };
-    const [tempform] = Form.useForm();
-    const temponChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const [form] = Form.useForm();
+
+    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        tempform.setFieldsValue({ ...tempform, [name]: value });
+        form.setFieldsValue({ ...form, [name]: value });
     };
     return (
         <Form
-            form={ tempform }
+            form={ form }
             name={ LOGIN_TEXT }
             colon={ false }
             labelCol={ {
@@ -72,7 +73,7 @@ export const LoginForm = () => {
                     },
                 ] }
             >
-                <Input onChange={ temponChange } />
+                <Input onChange={ onChange } />
             </Form.Item>
             <Form.Item
                 label="Password"
