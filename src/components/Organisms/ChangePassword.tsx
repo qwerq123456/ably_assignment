@@ -1,8 +1,12 @@
+import {
+    Layout, Form, Input, Button
+} from 'antd';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { API, CreateAxios } from '../../utils';
-import { InputForm } from '../Molecules';
+import {
+    API, CreateAxios, FormLayout, FormStyle
+} from '../../utils';
 
 interface ChangePasswordProps {
     email: string;
@@ -12,30 +16,24 @@ const NEW_PASSWORD_TEXT = 'newPassword';
 const NEW_PASSWORD_CHECK_TEXT = 'newPasswordConfirm';
 const CHANGE_PASSWORD_TEXT = '비밀번호 변경';
 const CHANGE_PASSWORD_SUCCESS_TEXT = '비밀번호 변경 성공!';
-const CHANGE_PASSWORD_LABEL = 'change_password_label';
 const LOGIN_URL = '/login';
-
+const PLEASE_ENTER_NEW_PASSWORD = '새 비밀번호를 입력해주세요!';
+const PASSWORD_HAS_TO_SAME = '두 비밀번호가 같아야 합니다!';
 export const ChangePassword = ({ email, confirmToken }: ChangePasswordProps) => {
     const navigate = useNavigate();
 
-    const [form, setForm] = useState({
-        newPassword: '',
-        newPasswordConfirm: ''
-    });
-    const { newPassword, newPasswordConfirm } = form;
+    const [loading, setLoading] = useState(false);
 
-    const isPasswordSame = newPassword === newPasswordConfirm;
+    const [form] = Form.useForm();
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setForm({
-            ...form,
-            [name]: value,
-        });
+        form.setFieldsValue({ ...form, [name]: value });
     };
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const onFinish = async (values: { newPassword: string; newPasswordConfirm: string }) => {
+        const { newPassword, newPasswordConfirm } = values;
+        setLoading(true);
         try {
             const data = {
                 newPassword,
@@ -49,16 +47,62 @@ export const ChangePassword = ({ email, confirmToken }: ChangePasswordProps) => 
         } catch (error) {
             console.log(`[Error] in ChangePassword handleSubmit method with : ${error}`);
         }
+        setLoading(false);
     };
 
     return (
-        <form aria-label={ CHANGE_PASSWORD_LABEL } onSubmit={ handleSubmit }>
-            <InputForm title={ NEW_PASSWORD_TEXT } value={ newPassword } type="password" onChange={ onChange } />
-            <InputForm title={ NEW_PASSWORD_CHECK_TEXT } value={ newPasswordConfirm } type="password" onChange={ onChange } />
-            { isPasswordSame ? <div /> : <div> 비밀번호를 확인하세요 </div> }
-            <button type="submit">
-                { CHANGE_PASSWORD_TEXT }
-            </button>
-        </form>
+        <Layout style={ FormLayout }>
+            <Form
+                style={ FormStyle }
+                form={ form }
+                colon={ false }
+                initialValues={ {
+                    email: '',
+                    password: '',
+                } }
+                onFinish={ onFinish }
+            >
+                <Form.Item
+                    name={ NEW_PASSWORD_TEXT }
+                    label={ NEW_PASSWORD_TEXT }
+                    rules={ [
+                        {
+                            required: true,
+                            message: PLEASE_ENTER_NEW_PASSWORD,
+                        },
+                    ] }
+                    hasFeedback
+                >
+                    <Input.Password onChange={ onChange } />
+                </Form.Item>
+
+                <Form.Item
+                    name={ NEW_PASSWORD_CHECK_TEXT }
+                    label={ NEW_PASSWORD_CHECK_TEXT }
+                    dependencies={ [NEW_PASSWORD_TEXT] }
+                    hasFeedback
+                    rules={ [
+                        {
+                            required: true,
+                            message: PLEASE_ENTER_NEW_PASSWORD,
+                        },
+                        ({ getFieldValue }) => ({
+                            validator(_, value) {
+                                if (!value || getFieldValue(NEW_PASSWORD_TEXT) === value) {
+                                    return Promise.resolve();
+                                }
+
+                                return Promise.reject(new Error(PASSWORD_HAS_TO_SAME));
+                            },
+                        }),
+                    ] }
+                >
+                    <Input.Password onChange={ onChange } />
+                </Form.Item>
+                <Form.Item>
+                    <Button loading={ loading } htmlType="submit">{ CHANGE_PASSWORD_TEXT }</Button>
+                </Form.Item>
+            </Form>
+        </Layout>
     );
 };

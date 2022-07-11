@@ -1,12 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    API, ACCESS_TOKEN_NAME, deleteCookie, CreateAxios, UserInfoType
+    API, ACCESS_TOKEN_NAME, deleteCookie, CreateAxios, UserInfoType, UserInfoCardLayout
 } from '../../utils';
-import { InfoText, UserImage } from '../Molecules';
+
+import {
+    Descriptions, Layout, Space, Button, Image
+} from 'antd';
 
 const LOGIN_URL = '/login';
 const LOGOUT_TEXT = '로그아웃';
+const USER_INFO_TITLE = '유저 정보';
+const NAME_TEXT = 'name';
+const EMAIL_TEXT = 'email';
 
 export const UserInfoCard = () => {
     const navigate = useNavigate();
@@ -17,6 +23,7 @@ export const UserInfoCard = () => {
         profileImage: '',
         lastConnectedAt: new Date(),
     });
+    const [loading, setLoading] = useState(false);
 
     const getUserInfo = async () => {
         try {
@@ -28,29 +35,34 @@ export const UserInfoCard = () => {
         }
     };
     const logout = async () => {
+        setLoading(true);
         try {
             await CreateAxios.post(API.LOGOUT);
             deleteCookie(ACCESS_TOKEN_NAME);
-            navigate(LOGIN_URL);
         } catch (error) {
             console.log(`[Error] in UserInfoCard logout method with : ${error}`);
-            navigate(LOGIN_URL);
         }
+        setLoading(false);
+
+        navigate(LOGIN_URL);
     };
     useEffect(() => {
         getUserInfo();
     }, []);
 
     return (
-        <div>
-            <div>
-                <InfoText title="name" content={ userInfo.name } />
-                <InfoText title="email" content={ userInfo.email } />
-            </div>
-            <UserImage url={ userInfo.profileImage } />
-            <button type="button" onClick={ logout }>
+
+        <Layout style={ UserInfoCardLayout }>
+            <Space style={ { maxWidth: 600, height: 300 } }>
+                <Descriptions layout="horizontal" title={ USER_INFO_TITLE }>
+                    <Descriptions.Item label={ NAME_TEXT }>{ userInfo.name }</Descriptions.Item>
+                    <Descriptions.Item label={ EMAIL_TEXT }>{ userInfo.email }</Descriptions.Item>
+                </Descriptions>
+                <Image src={ userInfo.profileImage } style={ { width: 200 } } />
+            </Space>
+            <Button loading={ loading } htmlType="button" onClick={ logout } style={ { marginTop: 30, width: 100 } }>
                 { LOGOUT_TEXT }
-            </button>
-        </div>
+            </Button>
+        </Layout>
     );
 };
