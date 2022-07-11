@@ -18,6 +18,8 @@ module.exports = {
         },
     },
     rules: {
+        'import/no-cycle': 'off',
+        'no-console': 'off',
         'react-hooks/exhaustive-deps': 'off',
         'no-alert': 'off',
         'react/jsx-indent-props': [2, 4],
@@ -46,7 +48,9 @@ module.exports = {
                 devDependencies: ['.storybook/**', 'src/stories/**'],
             },
         ],
+        'max-len': ['warn', 150],
         'max-lines': ['warn', 150],
+
         'no-param-reassign': ['error', { props: false }],
         'no-use-before-define': 'off',
         '@typescript-eslint/no-use-before-define': ['error'],
