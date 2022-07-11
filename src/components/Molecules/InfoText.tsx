@@ -3,7 +3,7 @@ interface InfoTextProps {
     content: string;
 }
 
-const InfoText = ({ title, content }: InfoTextProps) => {
+export const InfoText = ({ title, content }: InfoTextProps) => {
     return (
         <div>
             <div>{ title }</div>
@@ -11,5 +11,3 @@ const InfoText = ({ title, content }: InfoTextProps) => {
         </div>
     );
 };
-
-export default InfoText;
