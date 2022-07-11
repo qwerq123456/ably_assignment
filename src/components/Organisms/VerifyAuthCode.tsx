@@ -1,6 +1,10 @@
 import { Dispatch, SetStateAction, useState } from 'react';
 import { API, ConfirmTokenResponseType, CreateAxios } from '../../utils';
 import { InputForm, RemainTimeCounter } from '../Molecules';
+import {
+    Button, Form, Input
+} from 'antd';
+import 'antd/dist/antd.css';
 
 interface VerifyAuthCodeProps {
     resetStepNum: () => void;
@@ -24,13 +28,15 @@ export const VerifyAuthCode = (props: VerifyAuthCodeProps) => {
     const [authCode, setAuthCode] = useState('');
     const [isTimeOut, setIsTimeOut] = useState(false);
 
+    const [form] = Form.useForm();
+
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { value } = e.target;
+        const { name, value } = e.target;
+        form.setFieldsValue({ ...form, [name]: value });
         setAuthCode(value);
     };
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const onFinish = async (values: { authCode: string }) => {
         try {
             console.log(`isTimeOut : ${isTimeOut}`);
             if (isTimeOut) {
@@ -53,12 +59,46 @@ export const VerifyAuthCode = (props: VerifyAuthCodeProps) => {
     };
 
     return (
-        <form aria-label={ VERIFY_AUTH_LABEL } onSubmit={ handleSubmit }>
-            <InputForm title={ VERIFY_CODE_TEXT } value={ authCode } onChange={ onChange } />
-            <RemainTimeCounter remainSecond={ remainSecond } setIsTimeOut={ setIsTimeOut } />
-            <button type="submit">
-                { NEXT_TEXT }
-            </button>
-        </form>
+        <Form
+            form={ form }
+            colon={ false }
+            labelCol={ {
+                span: 4,
+            } }
+            wrapperCol={ {
+                span: 16,
+            } }
+            initialValues={ {
+                email: '',
+            } }
+            onFinish={ onFinish }
+        >
+            <Form.Item
+                label={ VERIFY_CODE_TEXT }
+                name="authCode"
+                rules={ [
+                    {
+                        required: true,
+                        message: '인증코드를 입력해주세요',
+                    },
+                ] }
+            >
+                <Input onChange={ onChange } />
+            </Form.Item>
+            <Form.Item wrapperCol={ {
+                offset: 4,
+                span: 16,
+            } }
+            >
+                <RemainTimeCounter remainSecond={ remainSecond } setIsTimeOut={ setIsTimeOut } />
+            </Form.Item>
+            <Form.Item wrapperCol={ {
+                offset: 4,
+                span: 16,
+            } }
+            >
+                <Button htmlType="submit">{ NEXT_TEXT }</Button>
+            </Form.Item>
+        </Form>
     );
 };

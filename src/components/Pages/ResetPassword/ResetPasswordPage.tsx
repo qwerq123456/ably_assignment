@@ -19,7 +19,6 @@ export const ResetPasswordPage = () => {
 
     const RequestAuthCodeProps = {
         addStepNum,
-        email,
         setEmail,
         setIssueToken,
         setRemainMillisecond

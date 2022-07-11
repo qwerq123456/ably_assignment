@@ -1,14 +1,12 @@
 import { SetStateAction, Dispatch } from 'react';
 import { API, CreateAxios, IssueTokenResponseType } from '../../utils';
-import { InputForm } from '../Molecules';
 import {
-    Button, Form, Input, Typography
+    Button, Form, Input
 } from 'antd';
 import 'antd/dist/antd.css';
 
 interface RequestAuthCodeProps {
     addStepNum: () => void;
-    email: string;
     setEmail: Dispatch<SetStateAction<string>>;
     setIssueToken: Dispatch<SetStateAction<string>>;
     setRemainMillisecond: Dispatch<SetStateAction<number>>;
@@ -16,11 +14,9 @@ interface RequestAuthCodeProps {
 const EMAIL_TEXT = 'email';
 const NEXT_TEXT = '다음';
 
-const REQUEST_AUTH_LABEL = 'request_auth_label';
-
 export const RequestAuthCode = (props: RequestAuthCodeProps) => {
     const {
-        addStepNum, email, setEmail, setIssueToken, setRemainMillisecond
+        addStepNum, setEmail, setIssueToken, setRemainMillisecond
     } = props;
 
     const [form] = Form.useForm();
