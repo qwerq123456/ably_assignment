@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API } from '../../config';
-import { ACCESS_TOKEN_NAME, deleteCookie, getCookie } from '../../Cookies';
-import { APIErrorType, CreateAxios, UserInfoType } from '../../utils/api';
-import InfoText from '../Molecules/InfoText';
-import UserImage from '../Molecules/UserImage';
+import {
+    API, ACCESS_TOKEN_NAME, deleteCookie, CreateAxios, UserInfoType
+} from '../../utils';
+import { InfoText, UserImage } from '../Molecules';
 
 const LOGIN_URL = '/login';
 const LOGOUT_TEXT = '로그아웃';
 
-const UserInfoCard = () => {
+export const UserInfoCard = () => {
     const navigate = useNavigate();
 
     const [userInfo, setUserInfo] = useState({
@@ -24,14 +23,19 @@ const UserInfoCard = () => {
             const userInfoResponse: UserInfoType = await CreateAxios.get(API.USER);
             setUserInfo(userInfoResponse.data);
         } catch (error) {
-            const err = error as APIErrorType;
-            alert(err.response.data.error.message);
+            console.log(`[Error] in UserInfoCard getUserInfo method with : ${error}`);
             navigate(LOGIN_URL);
         }
     };
-    const logout = () => {
-        deleteCookie(ACCESS_TOKEN_NAME);
-        navigate(LOGIN_URL);
+    const logout = async () => {
+        try {
+            await CreateAxios.post(API.LOGOUT);
+            deleteCookie(ACCESS_TOKEN_NAME);
+            navigate(LOGIN_URL);
+        } catch (error) {
+            console.log(`[Error] in UserInfoCard logout method with : ${error}`);
+            navigate(LOGIN_URL);
+        }
     };
     useEffect(() => {
         getUserInfo();
@@ -50,5 +54,3 @@ const UserInfoCard = () => {
         </div>
     );
 };
-
-export default UserInfoCard;
